@@ -13,6 +13,10 @@
 import socket
 import socket_manager
 import random
+import time
+
+print("waiting to allow network to start")
+time.sleep(5)#to allow the network services on a machine to start (this is intended to run at startup)
 
 #lets build the deck
 #we shall use the notation colour card, e.g r0 for red zero and gs for green skip
