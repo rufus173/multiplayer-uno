@@ -20,21 +20,27 @@ time.sleep(5)#to allow the network services on a machine to start (this is inten
 
 #lets build the deck
 #we shall use the notation colour card, e.g r0 for red zero and gs for green skip
-deck = ["r0","g0","b0","y0"] #we can use w for wild , e.g. wn for wild card and wf for wild +4. for plus 2 we can use colour + t, e.g. gp for green +t
-#when wildcards are played a colour is selected and they will become colour + type, eg wf(wild +4) becomes gf(green +4)
-for i in range(2):
-    for c in ["r","g","b","y"]:
-        for n in range(9):
-            deck.append(c+str(n+1))
-        for s in ["s","r","t"]:#skip, reverse, plus 2
-            deck.append(c+s)
-for i in range(4):
-    deck.append("wn")#wild
-    deck.append("wf")#wild plus 4
+def build_deck():
+    global deck
+    deck = ["r0","g0","b0","y0"] #we can use w for wild , e.g. wn for wild card and wf for wild +4. for plus 2 we can use colour + t, e.g. gp for green +t
+    #when wildcards are played a colour is selected and they will become colour + type, eg wf(wild +4) becomes gf(green +4)
+    for i in range(2):
+        for c in ["r","g","b","y"]:
+            for n in range(9):
+                deck.append(c+str(n+1))
+            for s in ["s","r","t"]:#skip, reverse, plus 2
+                deck.append(c+s)
+    for i in range(6):
+        deck.append("wn")#wild
+        deck.append("wf")#wild plus 4
+    random.shuffle(deck)
 while True:
     try:
+        build_deck()
         #get total number of players
         pcount = 1
+        player_names = [] #indexes correspond with keys in dictionary
+
         handle = socket_manager.handler()
         handle.auto_bind(8032)
         handle.listen(1)
@@ -44,9 +50,10 @@ while True:
         pcount = int(handle.sockets[0].recv(1024).decode())
         print(pcount)
         handle.listen(pcount-1)
-        for i in range(1,pcount):
-            handle.sockets[i].sendall(b"_")
-            handle.sockets[i].recv(1024)
+        for i in range(0,pcount):
+            handle.sockets[i].sendall(b"username")#request usernames
+            player_names.append(handle.sockets[i].recv(1024))
+        print("usernames gathered:",player_names)
 
         print("Starting")
 
@@ -86,7 +93,7 @@ while True:
                     print("player",i,"won")
                     handle.sockets[i].sendall(b"notify")
                     handle.sockets[i].recv(1024)
-                    handle.sockets[i].sendall(b"You win! :(")
+                    handle.sockets[i].sendall(b"You win! :)")
                     handle.sockets[i].recv(1024)
                     for x in hands:
                         if x != i:
@@ -94,7 +101,7 @@ while True:
                             handle.sockets[x].recv(1024)
                             handle.sockets[x].sendall(b"You loose :(")
                             handle.sockets[x].recv(1024)
-
+                    raise SystemExit("game finnished")
 
             if turn > pcount-1:#this before check is to allow for skip turns
                 turn = 0
@@ -106,10 +113,9 @@ while True:
             elif turn < 0:
                 turn = pcount-1
             for i in range(pcount):
-                print("sending discard")
                 handle.sockets[i].sendall(b"discard")
                 handle.sockets[i].recv(1024)
-                print("sending discard of",(discard+"\r").encode())
+                print("sending discard of",discard)
                 handle.sockets[i].sendall((discard+"\r").encode())
                 handle.sockets[i].recv(1024)
 
