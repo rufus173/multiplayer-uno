@@ -85,6 +85,7 @@ while True:#the mainloop
     elif turn < 0:
         turn = pcount-1
     for i in range(pcount):
+        print("sending discard")
         handle.sockets[i].sendall(b"discard")
         handle.sockets[i].recv(1024)
         print("sending discard of",(discard+"\r").encode())
@@ -172,4 +173,7 @@ while True:#the mainloop
         for c in hands[turn]:
             temp = temp + c + ","
         temp = temp.rstrip(",")
+        print("sending new hand")
         handle.sockets[turn].sendall(temp.encode())
+        print("sent new hand")
+        handle.sockets[turn].recv(1024)
