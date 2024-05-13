@@ -75,6 +75,22 @@ while True:#the mainloop
 
     #commands are issued telling the client what to expect, so go for their turn and discard to receive the discard pile
 
+    #check if a player has won
+    for i in hands:
+        if hands[i] == []:
+            print("player",i,"won")
+            handle.sockets[i].sendall(b"notify")
+            handle.sockets[i].recv(1024)
+            handle.sockets[i].sendall(b"You win! :(")
+            handle.sockets[i].recv(1024)
+            for x in hands:
+                if x != i:
+                    handle.sockets[x].sendall(b"notify")
+                    handle.sockets[x].recv(1024)
+                    handle.sockets[x].sendall(b"You loose :(")
+                    handle.sockets[x].recv(1024)
+
+
     if turn > pcount-1:#this before check is to allow for skip turns
         turn = 0
     elif turn < 0:

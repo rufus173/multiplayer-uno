@@ -237,3 +237,8 @@ while True:#mainloop
             server.sendall(b"_")
             print("Your new hand:")
             display(hand)
+        case "notify":
+            server.sendall(b"_")
+            message = server.recv(1024).decode()
+            server.sendall(b"_")
+            print("----- Message -----\n{}\n-------------------".format(message))
