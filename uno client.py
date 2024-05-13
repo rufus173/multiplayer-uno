@@ -85,6 +85,22 @@ discard = ""
 server = socket.socket()
 server.connect((ip,8032))
 
+#this is the manager that checks how many players are playing if you are the first to conenct
+
+status = server.recv(1024).decode()
+if status == "requesting player count":
+    while True:
+        try:
+            pcount = int(input("how many players total >>>"))
+            if pcount <= 1:
+                raise ValueError
+        except:
+            pass
+        break
+    server.sendall(str(pcount).encode())
+else:
+    server.sendall(b"_")
+
 hand = server.recv(4096).decode().split(",")
 print("\n\n\nyour starting hand")
 display(hand)

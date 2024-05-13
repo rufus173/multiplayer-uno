@@ -28,22 +28,26 @@ for i in range(4):
     deck.append("wn")#wild
     deck.append("wf")#wild plus 4
 
-while True: #assume the user is incompetent
-    try:
-        pcount = int(input("how many players (2+) >>>"))
-        if pcount < 2:
-            raise ValueError
-        break
-    except:
-        print("please enter a valaid number")
-
+#get total number of players
+pcount = 1
 handle = socket_manager.handler()
 handle.auto_bind(8032)
-handle.listen(pcount)
+handle.listen(1)
+
+print("waiting for player count")
+handle.sockets[0].sendall(b"requesting player count")
+pcount = int(handle.sockets[0].recv(1024).decode())
+print(pcount)
+handle.listen(pcount-1)
+for i in range(1,pcount):
+    handle.sockets[i].sendall(b"_")
+    handle.sockets[i].recv(1024)
+
+print("Starting")
 
 order = 1 #set to -1 to reverse turn order
 turn = 0#whos turn it is
-card_stack = 0 #for holding info about stacked +2s and +4s
+card_stack = 0 #for holding info about stacked handle.sockets[i].sendall(b"_")and +4s
 random.shuffle(deck)
 hands = {}
 
