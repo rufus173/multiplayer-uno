@@ -80,6 +80,7 @@ def display(hand):#MAKE SURE TO SEND THIS A LIST AND NOT A STRING
 #just setting up variables
 hand = []
 discard = ""
+opponent_info = {}
 
 #we will connect to the server
 server = socket.socket()
@@ -91,7 +92,7 @@ status = server.recv(1024).decode()
 if status == "requesting player count":
     while True:
         try:
-            pcount = int(input("how many players total >>>"))
+            pcount = int(input("how many players total >>> "))
             if pcount <= 1:
                 raise ValueError
             break
@@ -99,8 +100,10 @@ if status == "requesting player count":
             pass
 
     server.sendall(str(pcount).encode())
+    server.recv(1024)
+    server.sendall(input("enter username >>> ").encode())
 else:
-    server.sendall(b"_")
+    server.sendall(input("enter username >>> ").encode())
 
 hand = server.recv(4096).decode().split(",")
 print("\n\n\nyour starting hand")
@@ -110,6 +113,13 @@ server.sendall(b"_")#acknowledgement packet
 while True:#mainloop
     response = server.recv(1024).decode()
     match response:
+        case "player info":
+            server.sendall(b"_")
+            raw_data = server.recv(4096).decode()
+            raw_data = raw_data.split("\0")#split it into [[name,number of cards],[name, number of cards]]
+            opponent_info = []
+            for i in raw_data:
+                opponent_info.append(i.split("\r"))
         case "discard":
             server.sendall(b"_")
             discard = recv_data(server).decode()
@@ -148,7 +158,7 @@ while True:#mainloop
                 display(playable_cards)#must be sent in a list
                 while True:
                     try:
-                        chosen_card = playable_cards[int(input("Number >>>"))-1]
+                        chosen_card = playable_cards[int(input("Number >>> "))-1]
                         break
                     except:
                         pass
@@ -166,7 +176,7 @@ while True:#mainloop
                     print("Choose a colour for your wildcard.\n(1) red  (2) green  (3) blue  (4) yellow")
                     while True:
                         try:
-                            colour = ["r","g","b","y"][int(input("number >>>"))-1]
+                            colour = ["r","g","b","y"][int(input("number >>> "))-1]
                             break
                         except:
                             pass
@@ -211,7 +221,7 @@ while True:#mainloop
                 display(playable_cards)#must be sent in a list
                 while True:
                     try:
-                        chosen_card = playable_cards[int(input("Number >>>"))-1]
+                        chosen_card = playable_cards[int(input("Number >>> "))-1]
                         break
                     except:
                         pass
@@ -221,7 +231,7 @@ while True:#mainloop
                     print("Choose a colour for your wildcard.\n(1) red  (2) green  (3) blue  (4) yellow")
                     while True:
                         try:
-                            colour = ["r","g","b","y"][int(input("number >>>"))-1]
+                            colour = ["r","g","b","y"][int(input("number >>> "))-1]
                             break
                         except:
                             pass
