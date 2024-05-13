@@ -118,40 +118,39 @@ while True:
                 temp = temp.rstrip(",")
                 handle.sockets[turn].sendall(temp.encode())#resending their hand so i can easily deal with plus 2s and 4s
                 response = handle.sockets[turn].recv(1024).decode()#we get their card, or a request to draw 1
-                match response:
-                    case "draw":
-                        new_card = deck.pop(0)
-                        hands[turn].append(new_card)
-                        handle.sockets[turn].sendall(new_card.encode())
-                    case "card":
+                if response ==  "draw":
+                    new_card = deck.pop(0)
+                    hands[turn].append(new_card)
+                    handle.sockets[turn].sendall(new_card.encode())
+                if response == "card":
+                    handle.sockets[turn].sendall(b"_")
+                    incoming_card = handle.sockets[turn].recv(1024).decode()
+                    discard = incoming_card
+                    hands[turn].remove(incoming_card)#remnove cards from their hand that they play
+
+                    #special cards game logic
+                    if discard[0] == "w":
+                        handle.sockets[turn].sendall(b"choose colour")
+                        colour = handle.sockets[turn].recv(1024).decode()
+                        discard = colour + discard[1]
                         handle.sockets[turn].sendall(b"_")
-                        incoming_card = handle.sockets[turn].recv(1024).decode()
-                        discard = incoming_card
-                        hands[turn].remove(incoming_card)#remnove cards from their hand that they play
+                    else:
+                        handle.sockets[turn].sendall(b"no action needed")
+                    handle.sockets[turn].recv(1024)#acknowledge
 
-                        #special cards game logic
-                        if discard[0] == "w":
-                            handle.sockets[turn].sendall(b"choose colour")
-                            colour = handle.sockets[turn].recv(1024).decode()
-                            discard = colour + discard[1]
-                            handle.sockets[turn].sendall(b"_")
-                        else:
-                            handle.sockets[turn].sendall(b"no action needed")
-                        handle.sockets[turn].recv(1024)#acknowledge
-
-                        if incoming_card[1] == "r":#reverse
-                            order * -1
-                            print("reversed turn order to",order)
-                        if incoming_card[1] == "s":#skip
-                            turn += order
-                            print("skipped next players turn")
-                        if incoming_card[1] == "t":# +2
-                            card_stack += 2
-                            print("added 2 to stack")
-                        if incoming_card[1] == "f":# +4
-                            card_stack += 4
-                            print("added 4 to stack")
-                        # logic neeeded to work out plus 2s and plus 4s and logic for choosing colours
+                    if incoming_card[1] == "r":#reverse
+                        order * -1
+                        print("reversed turn order to",order)
+                    if incoming_card[1] == "s":#skip
+                        turn += order
+                        print("skipped next players turn")
+                    if incoming_card[1] == "t":# +2
+                        card_stack += 2
+                        print("added 2 to stack")
+                    if incoming_card[1] == "f":# +4
+                        card_stack += 4
+                        print("added 4 to stack")
+                    # logic neeeded to work out plus 2s and plus 4s and logic for choosing colours
                 print("discard pile",discard)
             else:
                 handle.sockets[turn].sendall(b"plus")
