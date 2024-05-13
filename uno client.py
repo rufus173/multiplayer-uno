@@ -94,9 +94,10 @@ if status == "requesting player count":
             pcount = int(input("how many players total >>>"))
             if pcount <= 1:
                 raise ValueError
+            break
         except:
             pass
-        break
+
     server.sendall(str(pcount).encode())
 else:
     server.sendall(b"_")
