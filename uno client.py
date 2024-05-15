@@ -17,7 +17,11 @@ import time
 
 #use https://harry-pc.duckdns.org to resolve ip
 #if not update manualy
-ip = "86.160.112.140"
+try:
+    ip = socket.gethostbyname("www.harry-pc.duckdns.org")
+except:
+    print("couldnt resolve ip")
+    ip = input("please enter ip manualy >>> ")
 
 
 def recv_data(server):#my program was struggling to get all the data through
