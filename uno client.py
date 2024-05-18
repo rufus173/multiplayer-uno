@@ -133,6 +133,10 @@ while True:#mainloop
             #we recieve an updated hand
             hand = server.recv(4096).decode().split(",")
             print("\n\n\n\n\n\n\n\n------------- Your turn -------------")
+            opponent_str = ""
+            for player in opponent_info:
+                opponent_str = opponent_str + "({}) - {} card(s)".format(player[0],player[1])
+            print("opponent info:",opponent_str)
             print("Your hand")
             display(hand)
             print("Discard pile")
@@ -199,6 +203,10 @@ while True:#mainloop
             server.sendall(b"_")
             hand = server.recv(4096).decode().split(",")
             print("\n\n\n\n\n\n\n\n------------- Your turn -------------")
+            opponent_str = ""
+            for player in opponent_info:
+                opponent_str = opponent_str + "({}) - {} card(s)".format(player[0],player[1])
+            print("opponent info:",opponent_str)
             print("Your hand")
             display(hand)
             print("Discard pile")
