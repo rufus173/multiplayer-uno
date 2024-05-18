@@ -14,9 +14,13 @@ print("""                 ____
 
 import socket
 import time
+import sys
 
-#use https://harry-pc.duckdns.org to resolve ip
-#if not update manualy
+try:
+    if sys.argv[1] == "t":
+        ip = "192.168.1.239"
+except:
+    pass
 try:
     ip = socket.gethostbyname("www.harry-pc.duckdns.org")
 except:
