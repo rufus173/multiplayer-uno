@@ -14,13 +14,6 @@ print("""                 ____
 
 import socket
 import time
-import sys
-
-try:
-    if sys.argv[1] == "t":
-        ip = "192.168.1.239"
-except:
-    pass
 try:
     ip = socket.gethostbyname("www.harry-pc.duckdns.org")
 except:
@@ -109,8 +102,10 @@ if status == "requesting player count":
 
     server.sendall(str(pcount).encode())
     server.recv(1024)
+    print("waiting for other players")
     server.sendall(input("enter username >>> ").encode())
 else:
+    print("waiting for other players")
     server.sendall(input("enter username >>> ").encode())
 
 hand = server.recv(4096).decode().split(",")
