@@ -81,7 +81,6 @@ while True:
         discard = "w"
         while discard[0] == "w":#stops the game starting on a wildcard
             discard = deck.pop(0)
-        print("discard pile",discard)
 
         while True:#the mainloop
 
@@ -115,7 +114,6 @@ while True:
             for i in range(pcount):
                 handle.sockets[i].sendall(b"discard")
                 handle.sockets[i].recv(1024)
-                print("sending discard of",discard)
                 handle.sockets[i].sendall((discard+"\r").encode())
                 handle.sockets[i].recv(1024)
                 handle.sockets[i].sendall(b"player info")
@@ -159,21 +157,15 @@ while True:
 
                     if incoming_card[1] == "r":#reverse
                         order * -1
-                        print("reversed turn order to",order)
                     if incoming_card[1] == "s":#skip
                         turn += order
-                        print("skipped next players turn")
                     if incoming_card[1] == "t":# +2
                         card_stack += 2
-                        print("added 2 to stack")
                     if incoming_card[1] == "f":# +4
                         card_stack += 4
-                        print("added 4 to stack")
                     # logic neeeded to work out plus 2s and plus 4s and logic for choosing colours
-                print("discard pile",discard)
             else:
                 handle.sockets[turn].sendall(b"plus")
-                print("doing plus card logic")
                 handle.sockets[turn].recv(1024)
                 temp = ""
                 for c in hands[turn]:
@@ -182,7 +174,6 @@ while True:
                 handle.sockets[turn].sendall(temp.encode())#resending their had to update them
                 response = handle.sockets[turn].recv(1024).decode()
                 if response == "no response":
-                    print("giving this player the stack of",card_stack)
                     for i in range(card_stack):
                         hands[turn].append(deck.pop(0))
                     card_stack = 0
@@ -191,10 +182,8 @@ while True:
                     hands[turn].remove(response)
                     if discard[1] == "t":# +2
                         card_stack += 2
-                        print("added 2 to stack")
                     if discard[1] == "f":# +4
                         card_stack += 4
-                        print("added 4 to stack")
                     if discard[0] == "w":
                         handle.sockets[turn].sendall(b"choose colour")
                         colour = handle.sockets[turn].recv(1024).decode()
@@ -208,9 +197,7 @@ while True:
                 for c in hands[turn]:
                     temp = temp + c + ","
                 temp = temp.rstrip(",")
-                print("sending new hand")
                 handle.sockets[turn].sendall(temp.encode())
-                print("sent new hand")
                 handle.sockets[turn].recv(1024)
     except Exception as problem:
         print("error occured, restarting")
