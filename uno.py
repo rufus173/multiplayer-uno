@@ -118,15 +118,15 @@ while True:
                 print("sending discard of",discard)
                 handle.sockets[i].sendall((discard+"\r").encode())
                 handle.sockets[i].recv(1024)
-                handle.sockets[i].sendall("player info")
+                handle.sockets[i].sendall(b"player info")
                 handle.sockets[i].recv(1024)
                 temp = ""
                 for x in range(pcount):
                     if i == x:
                         continue
-                    temp = temp + player_names[x] + "\r" + len(hands[x]) + "\0"
+                    temp = temp + player_names[x] + "\r" + str(len(hands[x])) + "\0"
                     temp = temp.rstrip("\0")
-                    handle.sockets[i].sendall(temp)
+                    handle.sockets[i].sendall(temp.encode())
 
             if card_stack == 0:#if they have not been +4d or +2d
                 handle.sockets[turn].sendall(b"go")#tell them its their turn
